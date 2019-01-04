@@ -16,7 +16,7 @@ const IndexPage = () => (
         <p>Now go build something great.</p>
         <Link to="/page-2/">Go to page 2</Link>
       </Container>
-      <MyComponent></MyComponent>
+      <MyComponent />
     </Page>
   </IndexLayout>
 )
@@ -34,9 +34,8 @@ type State = {
 }
 
 class MyComponent extends React.Component<{}, State> {
-
   constructor(props: object) {
-    super(props);
+    super(props)
 
     this.state = {
       response: null
@@ -45,36 +44,32 @@ class MyComponent extends React.Component<{}, State> {
 
   getRequest = async () => {
     const data = await axios('https://httpbin.org/get', {
-      // @ts-ignore
-      transformResponse: [...axios.defaults.transformResponse, (data, _) => {
-        console.log('>>>>>>>>>>>', data)
-        // data = data.data
-        let newData = {
-          userAgent: data.headers["User-Agent"],
-          origin: data.origin,
-          url: data.url
+      transformResponse: [
+        (data, _) => {
+          data = JSON.parse(data)
+          let newData = {
+            userAgent: data.headers['User-Agent'],
+            origin: data.origin,
+            url: data.url
+          }
+          console.log(newData)
+          return newData
         }
-        console.log(newData)
-        return newData;
-      }]
+      ]
     })
-    return data;
+    return data
   }
 
   componentDidMount() {
-    // @ts-ignore
-    this.getRequest().then(getResponse => this.setState({ response: getResponse }))
+    this.getRequest().then(({ data }) => this.setState({ response: data }))
   }
 
   render() {
     let result = () => {
       if (this.state.response) {
-        // @ts-ignore
-        console.log(`🤬 ${JSON.stringify(this.state.response.data)}`)
-        // @ts-ignore
-        return this.state.response.data.url
+        return this.state.response.url
       } else {
-        return "loading"
+        return 'loading'
       }
     }
     return (
